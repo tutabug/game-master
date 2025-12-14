@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { Document } from 'langchain/document';
 
 @Injectable()
 export class DocumentLoaderService {
@@ -9,7 +10,8 @@ export class DocumentLoaderService {
     return docs.map((doc) => doc.pageContent).join('\n');
   }
 
-  async loadPdfWithMetadata(filePath: string): Promise<any[]> {
-    throw new Error('Method not implemented');
+  async loadPdfWithMetadata(filePath: string): Promise<Document[]> {
+    const loader = new PDFLoader(filePath);
+    return loader.load();
   }
 }
