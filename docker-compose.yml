@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+    container_name: nestjs-app
+    ports:
+      - '3000:3000'
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/taskdb
+      - NODE_ENV=development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongodb
+    command: pnpm run start:dev
+
+  mongodb:
+    image: mongo:8
+    container_name: mongodb
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=taskdb
+
+volumes:
+  mongodb_data:
