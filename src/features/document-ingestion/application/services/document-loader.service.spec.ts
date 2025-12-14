@@ -18,7 +18,7 @@ describe('DocumentLoaderService', () => {
 
   describe('loadPdf', () => {
     it('should load a PDF and return text content', async () => {
-      const filePath = 'documents/SRD_CC_v5.2.1.pdf';
+      const filePath = 'documets/SRD_CC_v5.2.1.pdf';
 
       const result = await service.loadPdf(filePath);
 
@@ -28,13 +28,13 @@ describe('DocumentLoaderService', () => {
     });
 
     it('should throw error for non-existent file', async () => {
-      const filePath = 'documents/non-existent.pdf';
+      const filePath = 'documets/non-existent.pdf';
 
       await expect(service.loadPdf(filePath)).rejects.toThrow();
     });
 
     it('should extract page metadata from PDF', async () => {
-      const filePath = 'documents/SRD_CC_v5.2.1.pdf';
+      const filePath = 'documets/SRD_CC_v5.2.1.pdf';
 
       const result = await service.loadPdfWithMetadata(filePath);
 

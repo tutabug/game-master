@@ -10,6 +10,6 @@ export class DocumentChunk {
   constructor(
     public readonly id: string,
     public readonly content: string,
-    public readonly metadata: DocumentMetadata
+    public readonly metadata: DocumentMetadata,
   ) {}
 }

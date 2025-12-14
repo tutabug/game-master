@@ -28,6 +28,11 @@ src/
 
 ## Project Conventions
 
+### Package Manager
+- **Always use `pnpm`** for dependency management
+- Commands: `pnpm install`, `pnpm add`, `pnpm remove`
+- Never use `npm` or `yarn`
+
 ### File Organization
 - **Vertical Slices**: Each feature in `src/features/<feature-name>/`
 - **Clean Architecture Layers** within each feature:
@@ -212,7 +217,7 @@ export class TaskModule {}
 Shared database connection is in `DatabaseModule` (imported in `AppModule`).
 
 ## When Adding New Dependencies
-Install both package and types if needed:
+Always use `pnpm` to install packages and types if needed:
 ```bash
 pnpm add <package>
 pnpm add -D @types/<package>
