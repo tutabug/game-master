@@ -7,7 +7,7 @@ export const jestConfig: Config = {
   },
   testRegex: '.*.spec.ts$',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
   },
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: './reports/coverage',

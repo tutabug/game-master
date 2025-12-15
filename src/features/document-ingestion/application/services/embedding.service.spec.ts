@@ -1,15 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { EmbeddingService } from './embedding.service';
+import { MiniLmEmbeddingService } from './minilm-embedding.service';
+import { FeatureExtractionPipeline } from '../../domain/services/embedding.service';
 
-describe('EmbeddingService', () => {
-  let service: EmbeddingService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [EmbeddingService],
-    }).compile();
+describe('MiniLmEmbeddingService', () => {
+  let service: MiniLmEmbeddingService;
+  let mockExtractor: FeatureExtractionPipeline;
 
-    service = module.get<EmbeddingService>(EmbeddingService);
+  beforeEach(() => {
+    const mockEmbedding = new Array(384).fill(0).map((_, i) => i / 384);
+    
+    mockExtractor = {
+      call: jest.fn().mockResolvedValue({
+        data: new Float32Array(mockEmbedding),
+      }),
+    };
+
+    service = new MiniLmEmbeddingService(mockExtractor);
   });
 
   it('should be defined', () => {
@@ -35,16 +41,19 @@ describe('EmbeddingService', () => {
       const embedding2 = await service.generateEmbedding(text);
 
       expect(embedding1).toEqual(embedding2);
+      expect(mockExtractor.call).toHaveBeenCalledWith([text], { pooling: 'mean', normalize: true });
     });
 
-    it('should generate different embeddings for different text', async () => {
-      const text1 = 'Fireball spell';
-      const text2 = 'Magic Missile spell';
+    it('should call extractor with correct parameters for different texts', async () => {
+      const text1 = 'Fireball spell causes fire damage';
+      const text2 = 'Magic Missile spell causes force damage';
 
-      const embedding1 = await service.generateEmbedding(text1);
-      const embedding2 = await service.generateEmbedding(text2);
+      await service.generateEmbedding(text1);
+      await service.generateEmbedding(text2);
 
-      expect(embedding1).not.toEqual(embedding2);
+      expect(mockExtractor.call).toHaveBeenCalledWith([text1], { pooling: 'mean', normalize: true });
+      expect(mockExtractor.call).toHaveBeenCalledWith([text2], { pooling: 'mean', normalize: true });
+      expect(mockExtractor.call).toHaveBeenCalledTimes(2);
     });
 
     it('should handle empty string', async () => {
@@ -81,15 +90,13 @@ describe('EmbeddingService', () => {
       expect(embeddings.length).toBe(0);
     });
 
-    it('should batch process large arrays efficiently', async () => {
-      const texts = Array(100).fill('Test text');
+    it('should process multiple texts in batch', async () => {
+      const texts = ['Text 1', 'Text 2', 'Text 3'];
 
-      const startTime = Date.now();
       const embeddings = await service.generateEmbeddings(texts);
-      const duration = Date.now() - startTime;
 
-      expect(embeddings.length).toBe(100);
-      expect(duration).toBeLessThan(30000);
+      expect(embeddings.length).toBe(3);
+      expect(mockExtractor.call).toHaveBeenCalledTimes(3);
     });
   });
 });
