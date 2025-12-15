@@ -4,14 +4,8 @@ import { EmbeddingService } from '../../domain/services/embedding.service';
 
 @Injectable()
 export class OllamaEmbeddingService extends EmbeddingService {
-  private embeddings: OllamaEmbeddings;
-
-  constructor(baseUrl: string, model: string = 'nomic-embed-text') {
+  constructor(private readonly embeddings: OllamaEmbeddings) {
     super();
-    this.embeddings = new OllamaEmbeddings({
-      baseUrl,
-      model,
-    });
   }
 
   async generateEmbedding(text: string): Promise<number[]> {

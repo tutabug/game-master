@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers';
+import { OllamaEmbeddings } from '@langchain/ollama';
 import { IngestDocumentUseCase } from './ingest-document.use-case';
 import { DocumentLoaderService } from '../services/document-loader.service';
 import { SimpleTextChunkerService } from '../services/simple-text-chunker.service';
@@ -38,8 +39,6 @@ describe('IngestDocumentUseCase Integration', () => {
   });
 
   beforeEach(async () => {
-    const embeddingService = new OllamaEmbeddingService(ollamaBaseUrl, 'nomic-embed-text');
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         IngestDocumentUseCase,
@@ -49,8 +48,17 @@ describe('IngestDocumentUseCase Integration', () => {
           useClass: SimpleTextChunkerService,
         },
         {
+          provide: OllamaEmbeddings,
+          useFactory: () => {
+            return new OllamaEmbeddings({
+              baseUrl: ollamaBaseUrl,
+              model: 'nomic-embed-text',
+            });
+          },
+        },
+        {
           provide: EmbeddingService,
-          useValue: embeddingService,
+          useClass: OllamaEmbeddingService,
         },
       ],
     }).compile();
@@ -86,11 +94,11 @@ describe('IngestDocumentUseCase Integration', () => {
     console.log(`First chunk text preview: ${result.chunks[0].content.substring(0, 100)}...`);
   }, 120000);
 
-  it.skip('should generate consistent embeddings for same text', async () => {
+  it('should generate consistent embeddings for same text', async () => {
     const pdfPath = path.join(__dirname, '../../../../../documents/SRD_CC_v5.2.1.pdf');
 
-    const result1 = await useCase.execute(pdfPath);
-    const result2 = await useCase.execute(pdfPath);
+    const result1 = await useCase.execute(pdfPath, { maxChunks: 3 });
+    const result2 = await useCase.execute(pdfPath, { maxChunks: 3 });
 
     expect(result1.embeddings[0]).toEqual(result2.embeddings[0]);
   }, 300000);

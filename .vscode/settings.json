@@ -1,0 +1,9 @@
+{
+  "jest.disabledWorkspaceFolders": ["game-master"],
+  "jestrunner.jestCommand": "NODE_OPTIONS='--experimental-vm-modules' node_modules/.bin/jest",
+  "jestrunner.configPath": {
+    "**/*.integration.spec.ts": "test/jest-integration.config.ts",
+    "**/*.spec.ts": "test/jest-unit.config.ts"
+  },
+  "jestrunner.enableYarnPnpSupport": false
+}
