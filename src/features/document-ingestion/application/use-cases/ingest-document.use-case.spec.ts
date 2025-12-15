@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { IngestDocumentUseCase } from './ingest-document.use-case';
 import { DocumentLoaderService } from '../services/document-loader.service';
-import { TextChunkerService } from '../services/text-chunker.service';
+import { TextChunkerService } from '../../domain/services/text-chunker.service';
 import { EmbeddingService } from '../services/embedding.service';
 import { DocumentRepository } from '../../domain/repositories/document.repository';
 import { mock, MockProxy } from 'jest-mock-extended';
