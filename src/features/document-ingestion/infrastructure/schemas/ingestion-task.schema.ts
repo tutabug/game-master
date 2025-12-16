@@ -4,7 +4,7 @@ import { ChunkingTaskStatus } from '../../domain/entities/ingestion-task.entity'
 
 @Schema({ collection: 'chunking_tasks', timestamps: true })
 export class ChunkingTaskDocument extends Document {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   documentId: string;
 
   @Prop({ required: true })
@@ -14,7 +14,6 @@ export class ChunkingTaskDocument extends Document {
     required: true,
     enum: Object.values(ChunkingTaskStatus),
     default: ChunkingTaskStatus.PENDING,
-    index: true,
   })
   status: ChunkingTaskStatus;
 

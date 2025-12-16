@@ -9,7 +9,7 @@ import { OllamaEmbeddingService } from './application/services/ollama-embedding.
 import { IngestDocumentUseCase } from './application/use-cases/ingest-document.use-case';
 import { ChunkDocumentUseCase } from './application/use-cases/chunk-document.use-case';
 import { QdrantVectorRepository } from './infrastructure/repositories/qdrant-vector.repository';
-import { MongooseChunkingTaskRepository } from './infrastructure/repositories/mongoose-ingestion-task.repository';
+import { MongooseChunkingTaskRepository } from './infrastructure/repositories/mongoose-chunking-task.repository';
 import { MongooseStoredChunkRepository } from './infrastructure/repositories/mongoose-stored-chunk.repository';
 import { TextChunkerService } from './domain/services/text-chunker.service';
 import { EmbeddingService } from './domain/services/embedding.service';
