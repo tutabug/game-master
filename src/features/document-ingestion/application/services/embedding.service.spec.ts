@@ -1,14 +1,13 @@
 import { MiniLmEmbeddingService } from './minilm-embedding.service';
 import { FeatureExtractionPipeline } from '../../domain/services/embedding.service';
 
-
 describe('MiniLmEmbeddingService', () => {
   let service: MiniLmEmbeddingService;
   let mockExtractor: FeatureExtractionPipeline;
 
   beforeEach(() => {
     const mockEmbedding = new Array(384).fill(0).map((_, i) => i / 384);
-    
+
     mockExtractor = {
       call: jest.fn().mockResolvedValue({
         data: new Float32Array(mockEmbedding),
@@ -51,8 +50,14 @@ describe('MiniLmEmbeddingService', () => {
       await service.generateEmbedding(text1);
       await service.generateEmbedding(text2);
 
-      expect(mockExtractor.call).toHaveBeenCalledWith([text1], { pooling: 'mean', normalize: true });
-      expect(mockExtractor.call).toHaveBeenCalledWith([text2], { pooling: 'mean', normalize: true });
+      expect(mockExtractor.call).toHaveBeenCalledWith([text1], {
+        pooling: 'mean',
+        normalize: true,
+      });
+      expect(mockExtractor.call).toHaveBeenCalledWith([text2], {
+        pooling: 'mean',
+        normalize: true,
+      });
       expect(mockExtractor.call).toHaveBeenCalledTimes(2);
     });
 

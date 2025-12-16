@@ -24,6 +24,7 @@ import {
   StoredChunkDocument,
   StoredChunkSchema,
 } from './infrastructure/schemas/stored-chunk.schema';
+import { DocumentIngestionController } from './presentation/controllers/document-ingestion.controller';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import {
       { name: StoredChunkDocument.name, schema: StoredChunkSchema },
     ]),
   ],
+  controllers: [DocumentIngestionController],
   providers: [
     DocumentLoaderService,
     {

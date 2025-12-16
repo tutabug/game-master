@@ -7,9 +7,7 @@ import { MongooseTaskRepository } from './infrastructure/repositories/mongoose-t
 import { TaskDocument, TaskSchema } from './infrastructure/schemas/task.schema';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: TaskDocument.name, schema: TaskSchema }]),
-  ],
+  imports: [MongooseModule.forFeature([{ name: TaskDocument.name, schema: TaskSchema }])],
   controllers: [TaskController],
   providers: [
     CreateTaskUseCase,
