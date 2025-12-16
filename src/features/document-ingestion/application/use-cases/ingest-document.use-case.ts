@@ -3,11 +3,10 @@ import { DocumentLoaderService } from '../services/document-loader.service';
 import { TextChunkerService } from '../../domain/services/text-chunker.service';
 import { EmbeddingService } from '../../domain/services/embedding.service';
 import { VectorRepository } from '../../domain/repositories/vector.repository';
-import { DocumentChunk } from '../../domain/entities/document-chunk.entity';
 import { VectorPoint, VectorPayload } from '../../domain/entities/vector.entity';
 import {
   EMBEDDING_DEFAULTS,
-  CHUNKING_DEFAULTS,
+  RECURSIVE_CHUNKING_STRATEGY,
   DOCUMENT_DEFAULTS,
 } from '../constants/ingestion.constants';
 
@@ -55,9 +54,9 @@ export class IngestDocumentUseCase {
         chunkIndex: chunk.metadata.chunkIndex,
         pageNumber: chunk.metadata.pageNumber,
         content: chunk.content,
-        chunkStrategy: options.chunkStrategy || CHUNKING_DEFAULTS.STRATEGY,
-        chunkSize: CHUNKING_DEFAULTS.SIZE,
-        chunkOverlap: CHUNKING_DEFAULTS.OVERLAP,
+        chunkStrategy: options.chunkStrategy || RECURSIVE_CHUNKING_STRATEGY.strategy,
+        chunkSize: RECURSIVE_CHUNKING_STRATEGY.size,
+        chunkOverlap: RECURSIVE_CHUNKING_STRATEGY.overlap,
         embeddingModel: EMBEDDING_DEFAULTS.MODEL,
         embeddingDimension: embeddingDimension,
         createdAt: new Date().toISOString(),
