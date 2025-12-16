@@ -99,36 +99,28 @@ describe('DocumentIngestionController Integration', () => {
 
   describe('POST /document-ingestion/chunk', () => {
     it('should chunk a PDF document and return task details', async () => {
-      const pdfPath = path.join(__dirname, '../../../../../documents/SRD_CC_v5.2.1.pdf');
-
       const response = await request(app.getHttpServer()).post('/document-ingestion/chunk').send({
-        filePath: pdfPath,
-        maxChunks: 5,
-        chunkSize: 1000,
-        chunkOverlap: 200,
+        filename: 'SRD_CC_v5.2.1.pdf',
       });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('taskId');
       expect(response.body).toHaveProperty('documentId');
       expect(response.body.documentId).toMatch(/^SRD_CC_v5\.2\.1-[a-f0-9]{8}$/);
-      expect(response.body.totalChunks).toBe(5);
+      expect(response.body.totalChunks).toBeGreaterThan(0);
       expect(response.body.status).toBe('completed');
     });
 
-    it('should accept custom documentId', async () => {
-      const pdfPath = path.join(__dirname, '../../../../../documents/SRD_CC_v5.2.1.pdf');
-
+    it('should use default chunking configuration', async () => {
       const response = await request(app.getHttpServer())
         .post('/document-ingestion/chunk')
         .send({
-          filePath: pdfPath,
-          documentId: 'custom-doc-123',
-          maxChunks: 1,
+          filename: 'SRD_CC_v5.2.1.pdf',
         });
 
       expect(response.status).toBe(201);
-      expect(response.body.documentId).toBe('custom-doc-123');
+      expect(response.body.taskId).toBeDefined();
+      expect(response.body.totalChunks).toBeGreaterThan(0);
     });
 
     it('should validate required fields', async () => {
@@ -143,35 +135,17 @@ describe('DocumentIngestionController Integration', () => {
         ? response.body.message.join(' ') 
         : response.body.message;
       
-      expect(messageStr).toContain('filePath');
+      expect(messageStr).toContain('filename');
     });
 
-    it('should reject invalid chunkSize', async () => {
-      const pdfPath = path.join(__dirname, '../../../../../documents/SRD_CC_v5.2.1.pdf');
-
-      const response = await request(app.getHttpServer()).post('/document-ingestion/chunk')
-      .send({
-        filePath: pdfPath,
-        chunkSize: 50,
-        maxChunks: 1,
-      });
-
-      expect(response.status).toBe(400);
-    });
-
-    it('should use default chunking configuration when not specified', async () => {
-      const pdfPath = path.join(__dirname, '../../../../../documents/SRD_CC_v5.2.1.pdf');
-
+    it('should reject empty filename', async () => {
       const response = await request(app.getHttpServer())
         .post('/document-ingestion/chunk')
         .send({
-          filePath: pdfPath,
-          maxChunks: 1,
+          filename: '',
         });
 
-      expect(response.status).toBe(201);
-      expect(response.body.taskId).toBeDefined();
-      expect(response.body.totalChunks).toBe(1);
+      expect(response.status).toBe(400);
     });
   });
 });

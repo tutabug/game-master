@@ -47,6 +47,7 @@
     "@testcontainers/mongodb": "^11.10.0",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.11",
+    "@types/multer": "^2.0.0",
     "@types/node": "^20.10.6",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^11.0.0",

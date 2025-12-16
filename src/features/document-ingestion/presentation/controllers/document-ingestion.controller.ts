@@ -31,14 +31,11 @@ export class DocumentIngestionController {
     description: 'Error during document chunking',
   })
   async chunkDocument(@Body() dto: ChunkDocumentDto): Promise<ChunkDocumentResponseDto> {
-    const result = await this.chunkDocumentUseCase.execute(dto.filePath, {
-      documentId: dto.documentId,
-      chunkStrategy: dto.chunkStrategy,
-      chunkSize: dto.chunkSize,
-      chunkOverlap: dto.chunkOverlap,
-      maxChunks: dto.maxChunks,
-    });
+    const documentsPath =
+      process.env.NODE_ENV === 'production' ? '/usr/src/app/documents' : 'documents';
+    const filePath = `${documentsPath}/${dto.filename}`;
 
+    const result = await this.chunkDocumentUseCase.execute(filePath, {});
     return {
       taskId: result.taskId,
       documentId: result.documentId,

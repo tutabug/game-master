@@ -1,60 +1,14 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsNumber, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class ChunkDocumentDto {
   @ApiProperty({
-    description: 'Absolute path to the PDF file to chunk',
-    example: '/usr/src/app/documents/example.pdf',
+    description: 'Filename of the PDF document in the documents folder',
+    example: 'SRD_CC_v5.2.1.pdf',
   })
   @IsString()
   @IsNotEmpty()
-  filePath: string;
-
-  @ApiPropertyOptional({
-    description: 'Optional document ID (auto-generated from filename if not provided)',
-    example: 'my-document-id',
-  })
-  @IsString()
-  @IsOptional()
-  documentId?: string;
-
-  @ApiPropertyOptional({
-    description: 'Chunking strategy identifier',
-    example: 'recursive-1000-200',
-  })
-  @IsString()
-  @IsOptional()
-  chunkStrategy?: string;
-
-  @ApiPropertyOptional({
-    description: 'Size of each chunk in characters',
-    example: 1000,
-    minimum: 100,
-  })
-  @IsNumber()
-  @Min(100)
-  @IsOptional()
-  chunkSize?: number;
-
-  @ApiPropertyOptional({
-    description: 'Number of overlapping characters between chunks',
-    example: 200,
-    minimum: 0,
-  })
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  chunkOverlap?: number;
-
-  @ApiPropertyOptional({
-    description: 'Maximum number of chunks to process (for testing)',
-    example: 10,
-    minimum: 1,
-  })
-  @IsNumber()
-  @Min(1)
-  @IsOptional()
-  maxChunks?: number;
+  filename: string;
 }
 
 export class ChunkDocumentResponseDto {

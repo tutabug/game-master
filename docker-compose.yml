@@ -12,6 +12,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - ./documents:/usr/src/app/documents
     depends_on:
       - mongodb
     command: pnpm run start:dev
