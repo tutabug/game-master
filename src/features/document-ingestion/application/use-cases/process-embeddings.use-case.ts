@@ -11,7 +11,6 @@ export interface ProcessEmbeddingsInput {
   chunkingTaskId: string;
   documentId: string;
   embeddingConfig?: Partial<EmbeddingConfig>;
-  resume?: boolean;
 }
 
 export interface ProcessEmbeddingsOutput {
@@ -48,7 +47,7 @@ export class ProcessEmbeddingsUseCase {
 
     let task = await this.embeddingTaskRepository.findByChunkingTaskId(input.chunkingTaskId);
 
-    if (task && input.resume) {
+    if (task) {
       if (task.isCompleted()) {
         this.logger.log(
           `Embedding task already completed for chunking task ${input.chunkingTaskId}`,
@@ -66,10 +65,13 @@ export class ProcessEmbeddingsUseCase {
       if (task.isFailed()) {
         this.logger.log(`Resuming failed embedding task ${task.id}`);
         await this.embeddingTaskRepository.updateStatus(task.id, EmbeddingTaskStatus.PROCESSING);
-      } else if (task.isPending()) {
+      } else if (task.isPending() || task.isProcessing()) {
+        this.logger.log(
+          `Continuing embedding task ${task.id} (${task.processedChunks}/${task.totalChunks} chunks processed)`,
+        );
         await this.embeddingTaskRepository.updateStatus(task.id, EmbeddingTaskStatus.PROCESSING);
       }
-    } else if (!task) {
+    } else {
       task = await this.embeddingTaskRepository.create({
         chunkingTaskId: input.chunkingTaskId,
         documentId: input.documentId,
@@ -79,10 +81,6 @@ export class ProcessEmbeddingsUseCase {
         embeddingConfig: config,
       });
       await this.embeddingTaskRepository.updateStatus(task.id, EmbeddingTaskStatus.PROCESSING);
-    } else {
-      throw new Error(
-        `Embedding task already exists for chunking task ${input.chunkingTaskId}. Use resume=true to continue.`,
-      );
     }
 
     try {

@@ -29,11 +29,7 @@ export class MongooseStoredChunkRepository implements StoredChunkRepository {
     return this.chunkModel.countDocuments({ taskId }).exec();
   }
 
-  async findByTaskIdPaginated(
-    taskId: string,
-    skip: number,
-    limit: number,
-  ): Promise<StoredChunk[]> {
+  async findByTaskIdPaginated(taskId: string, skip: number, limit: number): Promise<StoredChunk[]> {
     const chunks = await this.chunkModel
       .find({ taskId })
       .sort({ chunkIndex: 1 })
