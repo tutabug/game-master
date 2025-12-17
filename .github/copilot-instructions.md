@@ -185,6 +185,51 @@ private toDomain(document: TaskDocument): Task {
 - **pnpm** used instead of npm for faster, more efficient dependency management
 - **No comments** - Code should be self-documenting. Do not add comments when generating code
 
+### Cyclomatic Complexity Rule
+**Keep cyclomatic complexity ≤ 7 per method/function** (from "Code That Fits in Your Head" by Mark Seemann)
+
+- **Why?** Human short-term memory can hold ~7 items. Code with complexity ≤ 7 fits in your head
+- **How?** Extract private methods when complexity exceeds 7
+- **Naming:** Use verb-based names for extracted methods (e.g., `validateInput()`, `processChunk()`, `buildResponse()`)
+- **Single Responsibility:** Each method should do one thing well
+- **Readability:** Main method should read like a book's table of contents
+
+Example of refactoring high complexity:
+```typescript
+// ❌ Bad: Cyclomatic complexity = 15
+async execute(input: Input): Promise<Output> {
+  if (!input.id) throw new Error('Missing id');
+  const data = await this.repo.find(input.id);
+  if (!data) throw new Error('Not found');
+  if (data.status === 'completed') return this.buildResponse(data);
+  if (data.status === 'failed') await this.retry(data);
+  // ... more conditions and logic
+}
+
+// ✅ Good: Complexity = 3, extracted methods have complexity ≤ 7
+async execute(input: Input): Promise<Output> {
+  this.validateInput(input);
+  const data = await this.findData(input.id);
+  return await this.processData(data);
+}
+
+private validateInput(input: Input): void {
+  if (!input.id) throw new Error('Missing id');
+}
+
+private async findData(id: string): Promise<Data> {
+  const data = await this.repo.find(id);
+  if (!data) throw new Error('Not found');
+  return data;
+}
+
+private async processData(data: Data): Promise<Output> {
+  if (data.status === 'completed') return this.buildResponse(data);
+  if (data.status === 'failed') await this.retry(data);
+  return this.handlePending(data);
+}
+```
+
 ## Common Patterns
 
 ### Global Validation Pipe
