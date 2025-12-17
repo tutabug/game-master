@@ -78,6 +78,12 @@ importers:
       '@testcontainers/mongodb':
         specifier: ^11.10.0
         version: 11.10.0
+      '@testcontainers/ollama':
+        specifier: ^11.10.0
+        version: 11.10.0
+      '@testcontainers/qdrant':
+        specifier: ^11.10.0
+        version: 11.10.0
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.25
@@ -1451,6 +1457,12 @@ packages:
 
   '@testcontainers/mongodb@11.10.0':
     resolution: {integrity: sha512-PfnM+0UWddjzIhTgmYumyvt5tA0GiZ4uTf/SFEhmtRDcmBM70oZvQBdwDeYp7nMjkmxJFATPAXSR1Px7418bAg==}
+
+  '@testcontainers/ollama@11.10.0':
+    resolution: {integrity: sha512-moHXSb1xuvDrKjr3k2j2NQ7gwZ6hKVZK0G90i/oScYek6bOLnPUDnjBQeQHtSlWz7tzlZA4MaIvGiCgoSMaouA==}
+
+  '@testcontainers/qdrant@11.10.0':
+    resolution: {integrity: sha512-j+KFkDDj6HNoXGP3WKZFFobyLwFI4dE5qMpgmijcPg3cRyXT1s7nOignOL42lO53vjCSLLgRgquZkKAmOTQ6gQ==}
 
   '@tokenizer/inflate@0.2.7':
     resolution: {integrity: sha512-MADQgmZT1eKjp06jpI2yozxaU9uVs4GzzgSL+uEq7bVcJ9V1ZXQkeGNql1fsSI0gMy1vhvNTNbUqrx+pZfJVmg==}
@@ -5791,6 +5803,24 @@ snapshots:
   '@testcontainers/mongodb@11.10.0':
     dependencies:
       compare-versions: 6.1.1
+      testcontainers: 11.10.0
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - react-native-b4a
+      - supports-color
+
+  '@testcontainers/ollama@11.10.0':
+    dependencies:
+      testcontainers: 11.10.0
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - react-native-b4a
+      - supports-color
+
+  '@testcontainers/qdrant@11.10.0':
+    dependencies:
       testcontainers: 11.10.0
     transitivePeerDependencies:
       - bare-abort-controller
