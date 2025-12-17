@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --config ./test/jest-unit.config.ts",
     "test:integration": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config ./test/jest-integration.config.ts",
     "chunk": "ts-node -r tsconfig-paths/register src/cli/chunk-document.cli.ts",
-    "embed": "ts-node -r tsconfig-paths/register src/cli/embed-document.cli.ts"
+    "embed": "ts-node -r tsconfig-paths/register src/cli/embed-document.cli.ts",
+    "search": "ts-node -r tsconfig-paths/register src/cli/search-vectors.cli.ts"
   },
   "dependencies": {
     "@langchain/community": "1.1.0",

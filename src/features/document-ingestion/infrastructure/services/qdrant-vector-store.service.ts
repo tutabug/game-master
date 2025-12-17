@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { ConfigService } from '@nestjs/config';
-import { EmbeddingVector, VectorStoreService } from '../../domain/services/vector-store.service';
+import {
+  EmbeddingVector,
+  VectorStoreService,
+  SearchResult,
+} from '../../domain/services/vector-store.service';
 
 @Injectable()
 export class QdrantVectorStoreService implements VectorStoreService {
@@ -49,5 +53,38 @@ export class QdrantVectorStoreService implements VectorStoreService {
     } catch (error) {
       return false;
     }
+  }
+
+  async searchVectors(
+    collectionName: string,
+    queryVector: number[],
+    limit: number,
+    documentId?: string,
+  ): Promise<SearchResult[]> {
+    const filter = documentId
+      ? {
+          must: [
+            {
+              key: 'documentId',
+              match: {
+                value: documentId,
+              },
+            },
+          ],
+        }
+      : undefined;
+
+    const searchResult = await this.client.search(collectionName, {
+      vector: queryVector,
+      limit,
+      filter,
+      with_payload: true,
+    });
+
+    return searchResult.map((result) => ({
+      id: result.id as string,
+      score: result.score,
+      payload: result.payload as SearchResult['payload'],
+    }));
   }
 }
