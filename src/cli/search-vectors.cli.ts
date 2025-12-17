@@ -97,7 +97,9 @@ async function main() {
       if (result.payload.pageNumber) {
         console.log(`Page Number: ${result.payload.pageNumber}`);
       }
-      console.log(`\nContent:\n${result.payload.content.substring(0, 500)}${result.payload.content.length > 500 ? '...' : ''}`);
+      console.log(
+        `\nContent:\n${result.payload.content.substring(0, 500)}${result.payload.content.length > 500 ? '...' : ''}`,
+      );
       console.log('─'.repeat(80));
     });
 

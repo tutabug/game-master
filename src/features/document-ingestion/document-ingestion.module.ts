@@ -33,7 +33,6 @@ import {
   EmbeddingTaskDocument,
   EmbeddingTaskSchema,
 } from './infrastructure/schemas/embedding-task.schema';
-import { DocumentIngestionController } from './presentation/controllers/document-ingestion.controller';
 
 @Module({
   imports: [
@@ -44,7 +43,6 @@ import { DocumentIngestionController } from './presentation/controllers/document
       { name: EmbeddingTaskDocument.name, schema: EmbeddingTaskSchema },
     ]),
   ],
-  controllers: [DocumentIngestionController],
   providers: [
     DocumentLoaderService,
     {
