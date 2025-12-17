@@ -43,8 +43,12 @@ async function main() {
     }
 
     if (!chunkingTask.isCompleted()) {
-      console.error(`❌ Error: Chunking task is not completed. Current status: ${chunkingTask.status}`);
-      console.error('   Please wait for the chunking task to complete before generating embeddings.');
+      console.error(
+        `❌ Error: Chunking task is not completed. Current status: ${chunkingTask.status}`,
+      );
+      console.error(
+        '   Please wait for the chunking task to complete before generating embeddings.',
+      );
       process.exit(1);
     }
 
