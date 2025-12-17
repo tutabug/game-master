@@ -7,3 +7,5 @@ export const DEFAULT_EMBEDDING_CONFIG: EmbeddingConfig = {
 };
 
 export const EMBEDDING_BATCH_SIZE = 50;
+
+export const EMBEDDING_CONCURRENCY = 5;

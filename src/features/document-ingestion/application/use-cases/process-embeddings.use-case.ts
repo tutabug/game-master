@@ -9,7 +9,11 @@ import {
   EmbeddingConfig,
 } from '../../domain/entities/embedding-task.entity';
 import { StoredChunk } from '../../domain/entities/stored-chunk.entity';
-import { DEFAULT_EMBEDDING_CONFIG, EMBEDDING_BATCH_SIZE } from '../constants/embedding.constants';
+import {
+  DEFAULT_EMBEDDING_CONFIG,
+  EMBEDDING_BATCH_SIZE,
+  EMBEDDING_CONCURRENCY,
+} from '../constants/embedding.constants';
 import { createHash } from 'crypto';
 
 export interface ProcessEmbeddingsInput {
@@ -138,14 +142,16 @@ export class ProcessEmbeddingsUseCase {
     totalChunks: number,
     config: EmbeddingConfig,
   ): Promise<void> {
-    this.logger.log(`Processing ${totalChunks} chunks in batches of ${EMBEDDING_BATCH_SIZE}`);
+    this.logger.log(
+      `Processing ${totalChunks} chunks in batches of ${EMBEDDING_BATCH_SIZE} with ${EMBEDDING_CONCURRENCY} concurrent workers`,
+    );
 
     let processedCount = task.processedChunks;
     let offset = 0;
 
     while (offset < totalChunks) {
       const batchChunks = await this.fetchChunkBatch(input.chunkingTaskId, offset, totalChunks);
-      processedCount = await this.processBatch(
+      processedCount = await this.processBatchInParallel(
         batchChunks,
         input,
         task,
@@ -197,6 +203,34 @@ export class ProcessEmbeddingsUseCase {
         processedCount++;
         this.logProgressIfNeeded(processedCount, totalChunks);
       }
+    }
+
+    return processedCount;
+  }
+
+  private async processBatchInParallel(
+    chunks: StoredChunk[],
+    input: ProcessEmbeddingsInput,
+    task: EmbeddingTask,
+    config: EmbeddingConfig,
+    initialProcessedCount: number,
+    totalChunks: number,
+  ): Promise<number> {
+    let processedCount = initialProcessedCount;
+
+    // Process chunks in parallel using concurrency limit
+    for (let i = 0; i < chunks.length; i += EMBEDDING_CONCURRENCY) {
+      const concurrentChunks = chunks.slice(i, i + EMBEDDING_CONCURRENCY);
+
+      const results = await Promise.all(
+        concurrentChunks.map((chunk) =>
+          this.processChunk(chunk, input, task, config, processedCount, totalChunks),
+        ),
+      );
+
+      const successCount = results.filter((wasProcessed) => wasProcessed).length;
+      processedCount += successCount;
+      this.logProgressIfNeeded(processedCount, totalChunks);
     }
 
     return processedCount;
