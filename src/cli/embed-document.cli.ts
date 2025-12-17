@@ -30,7 +30,7 @@ async function main() {
   console.log('⏳ Starting NestJS application...\n');
 
   const app = await NestFactory.createApplicationContext(AppModule, {
-    logger: ['error', 'warn'],
+    logger: ['log', 'error', 'warn'],
   });
 
   try {
