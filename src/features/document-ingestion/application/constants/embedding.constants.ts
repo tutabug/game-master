@@ -5,3 +5,5 @@ export const DEFAULT_EMBEDDING_CONFIG: EmbeddingConfig = {
   dimension: 768,
   collectionName: 'documents',
 };
+
+export const EMBEDDING_BATCH_SIZE = 50;

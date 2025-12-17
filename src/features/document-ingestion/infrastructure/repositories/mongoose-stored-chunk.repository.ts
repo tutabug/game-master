@@ -25,6 +25,24 @@ export class MongooseStoredChunkRepository implements StoredChunkRepository {
     return chunks.map((chunk) => this.toDomain(chunk));
   }
 
+  async countByTaskId(taskId: string): Promise<number> {
+    return this.chunkModel.countDocuments({ taskId }).exec();
+  }
+
+  async findByTaskIdPaginated(
+    taskId: string,
+    skip: number,
+    limit: number,
+  ): Promise<StoredChunk[]> {
+    const chunks = await this.chunkModel
+      .find({ taskId })
+      .sort({ chunkIndex: 1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    return chunks.map((chunk) => this.toDomain(chunk));
+  }
+
   private toDomain(document: StoredChunkDocument): StoredChunk {
     return new StoredChunk(
       document._id.toString(),

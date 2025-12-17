@@ -19,4 +19,5 @@ export interface EmbeddingVector {
 export abstract class VectorStoreService {
   abstract storeVectors(collectionName: string, vectors: EmbeddingVector[]): Promise<void>;
   abstract ensureCollection(collectionName: string, dimension: number): Promise<void>;
+  abstract vectorExists(collectionName: string, vectorId: string): Promise<boolean>;
 }

@@ -11,4 +11,12 @@ export abstract class StoredChunkRepository {
   abstract createMany(chunks: CreateStoredChunkData[]): Promise<StoredChunk[]>;
 
   abstract findByTaskId(taskId: string): Promise<StoredChunk[]>;
+
+  abstract countByTaskId(taskId: string): Promise<number>;
+
+  abstract findByTaskIdPaginated(
+    taskId: string,
+    skip: number,
+    limit: number,
+  ): Promise<StoredChunk[]>;
 }

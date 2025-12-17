@@ -9,20 +9,26 @@ async function main() {
   const args = process.argv.slice(2);
 
   if (args.length === 0) {
-    console.error('Usage: pnpm embed <chunking-task-id>');
+    console.error('Usage: pnpm embed <chunking-task-id> [--resume]');
     console.error('');
     console.error('Description:');
     console.error('  Generate embeddings for chunks from a completed chunking task');
     console.error('  and store them in Qdrant vector database.');
     console.error('');
+    console.error('Options:');
+    console.error('  --resume    Resume a failed or interrupted embedding task');
+    console.error('');
     console.error('Examples:');
     console.error('  pnpm embed 6941d97319a7a66b48a56546');
+    console.error('  pnpm embed 6941d97319a7a66b48a56546 --resume');
     console.error('');
     console.error('Note: The chunking task must be completed before running embeddings.');
+    console.error('      Use --resume to continue from where it left off if interrupted.');
     process.exit(1);
   }
 
   const chunkingTaskId = args[0];
+  const resume = args.includes('--resume');
 
   console.log(`🔍 Processing embeddings for chunking task: ${chunkingTaskId}`);
   console.log('⏳ Starting NestJS application...\n');
@@ -56,6 +62,9 @@ async function main() {
     console.log(`   Document ID:  ${chunkingTask.documentId}`);
     console.log(`   Total Chunks: ${chunkingTask.totalChunks}`);
     console.log(`   Status:       ${chunkingTask.status}`);
+    if (resume) {
+      console.log(`   Mode:         Resume (skip already processed chunks)`);
+    }
     console.log('');
 
     console.log('🔄 Generating embeddings...');
@@ -64,6 +73,7 @@ async function main() {
     const result = await processEmbeddingsUseCase.execute({
       chunkingTaskId: chunkingTask.id,
       documentId: chunkingTask.documentId,
+      resume,
     });
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);

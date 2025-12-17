@@ -39,4 +39,15 @@ export class QdrantVectorStoreService implements VectorStoreService {
       points,
     });
   }
+
+  async vectorExists(collectionName: string, vectorId: string): Promise<boolean> {
+    try {
+      const result = await this.client.retrieve(collectionName, {
+        ids: [vectorId],
+      });
+      return result.length > 0;
+    } catch (error) {
+      return false;
+    }
+  }
 }
