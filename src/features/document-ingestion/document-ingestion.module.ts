@@ -5,6 +5,8 @@ import { OllamaEmbeddings } from '@langchain/ollama';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { DocumentLoaderService } from './application/services/document-loader.service';
 import { SimpleTextChunkerService } from './application/services/simple-text-chunker.service';
+import { TocTextChunkerService } from './application/services/toc-text-chunker.service';
+import { ChunkerStrategyRegistry } from './application/services/chunker-strategy-registry.service';
 import { OllamaEmbeddingService } from './application/services/ollama-embedding.service';
 import { IngestDocumentUseCase } from './application/use-cases/ingest-document.use-case';
 import { ChunkDocumentUseCase } from './application/use-cases/chunk-document.use-case';
@@ -45,9 +47,15 @@ import {
   ],
   providers: [
     DocumentLoaderService,
+    SimpleTextChunkerService,
+    TocTextChunkerService,
+    ChunkerStrategyRegistry,
     {
       provide: TextChunkerService,
-      useClass: SimpleTextChunkerService,
+      useFactory: (registry: ChunkerStrategyRegistry) => {
+        return registry;
+      },
+      inject: [ChunkerStrategyRegistry],
     },
     {
       provide: OllamaEmbeddings,
@@ -57,6 +65,19 @@ import {
         return new OllamaEmbeddings({ baseUrl, model });
       },
       inject: [ConfigService],
+    },
+    {
+      provide: 'CHUNKER_REGISTRY_INIT',
+      useFactory: (
+        registry: ChunkerStrategyRegistry,
+        simpleChunker: SimpleTextChunkerService,
+        tocChunker: TocTextChunkerService,
+      ) => {
+        registry.register(simpleChunker);
+        registry.register(tocChunker);
+        return registry;
+      },
+      inject: [ChunkerStrategyRegistry, SimpleTextChunkerService, TocTextChunkerService],
     },
     {
       provide: EmbeddingService,

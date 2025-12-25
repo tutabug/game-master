@@ -30,7 +30,7 @@ describe('SimpleTextChunkerService', () => {
         { pageContent: 'B'.repeat(2000), metadata: { source: 'test.pdf', loc: { pageNumber: 2 } } },
       ];
 
-      const chunks = await service.chunkDocuments(documents);
+      const chunks = await service.chunkDocuments(documents, { chunkSize: 1000, overlap: 200 });
 
       expect(chunks).toBeDefined();
       expect(Array.isArray(chunks)).toBe(true);
@@ -57,7 +57,7 @@ describe('SimpleTextChunkerService', () => {
     it('should handle empty documents array', async () => {
       const documents = [];
 
-      const chunks = await service.chunkDocuments(documents);
+      const chunks = await service.chunkDocuments(documents, { chunkSize: 1000, overlap: 200 });
 
       expect(chunks).toBeDefined();
       expect(chunks.length).toBe(0);

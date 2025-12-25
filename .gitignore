@@ -41,3 +41,13 @@ lerna-debug.log*
 
 # Documents
 /documets
+
+# Python
+scripts/python/.venv/
+scripts/python/__pycache__/
+scripts/python/*.pyc
+*.py[cod]
+*$py.class
+
+# Markdown output
+documents/markdown/

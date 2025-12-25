@@ -1,0 +1,12 @@
+{
+  "strategy": "toc",
+  "config": {
+    "maxChunkSize": 5000,
+    "minChunkSize": 100,
+    "combineSmallSections": true,
+    "headerPatterns": [
+      "^#+\\s+(.+)$",
+      "^([A-Z][A-Za-z\\s]+)\\s*$"
+    ]
+  }
+}

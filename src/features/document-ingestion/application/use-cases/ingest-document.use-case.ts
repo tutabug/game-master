@@ -34,7 +34,10 @@ export class IngestDocumentUseCase {
   async execute(filePath: string, options: IngestDocumentOptions): Promise<IngestedDocument> {
     const documents = await this.documentLoader.loadPdfWithMetadata(filePath);
 
-    let chunks = await this.textChunker.chunkDocuments(documents);
+    let chunks = await this.textChunker.chunkDocuments(documents, {
+      chunkSize: 1000,
+      overlap: 200,
+    });
 
     if (options.maxChunks && options.maxChunks > 0) {
       chunks = chunks.slice(0, options.maxChunks);
