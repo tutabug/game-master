@@ -2,11 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import * as path from 'path';
 import { DocumentLoaderService } from '../services/document-loader.service';
-import { TextChunkerService } from '../../domain/services/text-chunker.service';
+import { ChunkerStrategyRegistry } from '../services/chunker-strategy-registry.service';
 import { ChunkingTaskRepository } from '../../domain/repositories/ingestion-task.repository';
 import { StoredChunkRepository } from '../../domain/repositories/stored-chunk.repository';
 import { ChunkingConfig, ChunkingTaskStatus } from '../../domain/entities/ingestion-task.entity';
 import { RECURSIVE_CHUNKING_STRATEGY } from '../constants/ingestion.constants';
+import { ChunkStrategy } from '../../domain/enums/chunk-strategy.enum';
+import {
+  TocChunkerConfig,
+  RecursiveChunkerConfig,
+} from '../../domain/config/chunker-config.interface';
 
 export interface ChunkDocumentOptions {
   documentId?: string;
@@ -14,6 +19,8 @@ export interface ChunkDocumentOptions {
   chunkSize?: number;
   chunkOverlap?: number;
   chunkStrategy?: string;
+  tocConfig?: Partial<TocChunkerConfig>;
+  collectionName?: string;
 }
 
 export interface ChunkDocumentResult {
@@ -27,7 +34,7 @@ export interface ChunkDocumentResult {
 export class ChunkDocumentUseCase {
   constructor(
     private readonly documentLoader: DocumentLoaderService,
-    private readonly textChunker: TextChunkerService,
+    private readonly chunkerRegistry: ChunkerStrategyRegistry,
     private readonly taskRepository: ChunkingTaskRepository,
     private readonly chunkRepository: StoredChunkRepository,
   ) {}
@@ -52,11 +59,22 @@ export class ChunkDocumentUseCase {
     try {
       await this.taskRepository.updateStatus(task.id, ChunkingTaskStatus.PROCESSING);
 
-      const documents = await this.documentLoader.loadPdfWithMetadata(filePath);
-      let chunks = await this.textChunker.chunkDocuments(documents, {
-        chunkSize: chunkingConfig.size,
-        overlap: chunkingConfig.overlap,
-      });
+      const documents = await this.documentLoader.loadDocument(filePath);
+
+      const strategy = (options.chunkStrategy || 'recursive') as ChunkStrategy;
+      const chunker = this.chunkerRegistry.getChunker(strategy);
+
+      let chunks;
+      if (strategy === ChunkStrategy.TOC && options.tocConfig) {
+        chunks = await chunker.chunkDocuments(documents, options.tocConfig as TocChunkerConfig);
+      } else if (strategy === ChunkStrategy.RECURSIVE) {
+        chunks = await chunker.chunkDocuments(documents, {
+          chunkSize: chunkingConfig.size,
+          overlap: chunkingConfig.overlap,
+        } as RecursiveChunkerConfig);
+      } else {
+        chunks = await chunker.chunkDocuments(documents, {});
+      }
 
       if (options.maxChunks && options.maxChunks > 0) {
         chunks = chunks.slice(0, options.maxChunks);
@@ -69,7 +87,7 @@ export class ChunkDocumentUseCase {
         pageNumber: chunk.metadata.pageNumber,
       }));
 
-      await this.chunkRepository.createMany(storedChunks);
+      await this.chunkRepository.createMany(storedChunks, options.collectionName);
       const updatedTask = await this.taskRepository.markCompleted(task.id, chunks.length);
 
       return {

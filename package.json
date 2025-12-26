@@ -20,6 +20,7 @@
     "test:integration": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config ./test/jest-integration.config.ts",
     "convert-pdf": "ts-node -r tsconfig-paths/register src/cli/convert-pdf.cli.ts",
     "chunk": "ts-node -r tsconfig-paths/register src/cli/chunk-document.cli.ts",
+    "test-toc": "ts-node -r tsconfig-paths/register src/cli/test-toc-chunking.cli.ts",
     "embed": "ts-node -r tsconfig-paths/register src/cli/embed-document.cli.ts",
     "search": "ts-node -r tsconfig-paths/register src/cli/search-vectors.cli.ts"
   },

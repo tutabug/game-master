@@ -1,0 +1,12 @@
+{
+  "documentId": "srd-markdown-toc",
+  "chunkStrategy": "toc",
+  "config": {
+    "maxChunkSize": 2000,
+    "minChunkSize": 200,
+    "combineSmallSections": true,
+    "headerPatterns": [
+      "/^#+\\s+(.+)$/m"
+    ]
+  }
+}

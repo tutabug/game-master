@@ -15,8 +15,15 @@ export class MongooseStoredChunkRepository implements StoredChunkRepository {
     private readonly chunkModel: Model<StoredChunkDocument>,
   ) {}
 
-  async createMany(chunks: CreateStoredChunkData[]): Promise<StoredChunk[]> {
-    const documents = await this.chunkModel.insertMany(chunks);
+  async createMany(
+    chunks: CreateStoredChunkData[],
+    collectionName?: string,
+  ): Promise<StoredChunk[]> {
+    const model = collectionName
+      ? this.chunkModel.db.model(StoredChunkDocument.name, this.chunkModel.schema, collectionName)
+      : this.chunkModel;
+
+    const documents = await model.insertMany(chunks);
     return documents.map((doc) => this.toDomain(doc));
   }
 

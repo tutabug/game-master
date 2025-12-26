@@ -10,15 +10,29 @@ async function main() {
   const args = process.argv.slice(2);
 
   if (args.length === 0) {
-    console.error('Usage: pnpm chunk <filename-or-path>');
+    console.error(
+      'Usage: pnpm chunk <filename-or-path> [--config <config.json>] [--collection <name>]',
+    );
     console.error('Examples:');
     console.error('  pnpm chunk SRD_CC_v5.2.1.pdf          # Uses default documents/ folder');
     console.error('  pnpm chunk /absolute/path/to/file.pdf  # Uses absolute path');
-    console.error('  pnpm chunk ../relative/path/file.pdf   # Uses relative path');
+    console.error(
+      '  pnpm chunk documents/markdown/SRD.md --config config/toc-markdown-config.json',
+    );
+    console.error('  pnpm chunk file.pdf --collection custom-chunks');
     process.exit(1);
   }
 
   const input = args[0];
+
+  // Parse CLI arguments
+  const configIndex = args.indexOf('--config');
+  const collectionIndex = args.indexOf('--collection');
+
+  const configPath = configIndex !== -1 && args[configIndex + 1] ? args[configIndex + 1] : null;
+  const collectionName =
+    collectionIndex !== -1 && args[collectionIndex + 1] ? args[collectionIndex + 1] : null;
+
   let filePath: string;
 
   if (path.isAbsolute(input)) {
@@ -44,10 +58,33 @@ async function main() {
   try {
     const chunkDocumentUseCase = app.get(ChunkDocumentUseCase);
 
+    // Load config if provided
+    let options: any = {};
+    if (configPath) {
+      const fullConfigPath = path.isAbsolute(configPath)
+        ? configPath
+        : path.join(process.cwd(), configPath);
+      if (!fs.existsSync(fullConfigPath)) {
+        console.error(`Error: Config file not found: ${fullConfigPath}`);
+        process.exit(1);
+      }
+      const configContent = fs.readFileSync(fullConfigPath, 'utf-8');
+      options = JSON.parse(configContent);
+      console.log(`📋 Using config: ${configPath}`);
+    }
+
+    // Override collection name from CLI if provided
+    if (collectionName) {
+      options.collectionName = collectionName;
+      console.log(`🗄️  Using collection: ${collectionName}`);
+    } else if (options.collectionName) {
+      console.log(`🗄️  Using collection from config: ${options.collectionName}`);
+    }
+
     console.log('🔄 Processing document...');
     const startTime = Date.now();
 
-    const result = await chunkDocumentUseCase.execute(filePath, {});
+    const result = await chunkDocumentUseCase.execute(filePath, options);
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
