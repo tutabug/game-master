@@ -1,0 +1,8 @@
+{
+  "documentId": "srd-markdown",
+  "chunkStrategy": "markdown",
+  "config": {
+    "chunkSize": 2000,
+    "chunkOverlap": 200
+  }
+}

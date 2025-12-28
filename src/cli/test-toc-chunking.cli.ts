@@ -3,10 +3,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { ChunkDocumentUseCase } from '../features/document-ingestion/application/use-cases/chunk-document.use-case';
-import { DEFAULT_TOC_CONFIG } from '../features/document-ingestion/domain/config/chunker-config.interface';
+import { DEFAULT_MARKDOWN_CONFIG } from '../features/document-ingestion/domain/config/chunker-config.interface';
 
 async function main() {
-  console.log('📚 Testing TOC Chunking with Markdown Document');
+  console.log('📚 Testing Markdown Chunking with Markdown Document');
   console.log('─'.repeat(50));
 
   const filePath = 'documents/markdown/SRD_CC_v5.2.1.md';
@@ -21,23 +21,20 @@ async function main() {
   try {
     const chunkDocumentUseCase = app.get(ChunkDocumentUseCase);
 
-    console.log('🔄 Processing document with TOC chunking strategy...');
+    console.log('🔄 Processing document with Markdown chunking strategy...');
     const startTime = Date.now();
 
     const result = await chunkDocumentUseCase.execute(filePath, {
-      documentId: 'srd-markdown-toc-test',
-      chunkStrategy: 'toc',
-      tocConfig: {
-        ...DEFAULT_TOC_CONFIG,
-        maxChunkSize: 2000,
-        minChunkSize: 200,
-        combineSmallSections: true,
+      documentId: 'srd-markdown-test',
+      chunkStrategy: 'markdown',
+      markdownConfig: {
+        ...DEFAULT_MARKDOWN_CONFIG,
       },
     });
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
-    console.log('\n✅ Document chunked successfully with TOC strategy!');
+    console.log('\n✅ Document chunked successfully with Markdown strategy!');
     console.log('─'.repeat(50));
     console.log(`📋 Task ID:      ${result.taskId}`);
     console.log(`📝 Document ID:  ${result.documentId}`);

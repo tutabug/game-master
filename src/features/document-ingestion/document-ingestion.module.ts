@@ -5,7 +5,7 @@ import { OllamaEmbeddings } from '@langchain/ollama';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { DocumentLoaderService } from './application/services/document-loader.service';
 import { SimpleTextChunkerService } from './application/services/simple-text-chunker.service';
-import { TocTextChunkerService } from './application/services/toc-text-chunker.service';
+import { MarkdownHeaderChunkerService } from './application/services/markdown-header-chunker.service';
 import { ChunkerStrategyRegistry } from './application/services/chunker-strategy-registry.service';
 import { OllamaEmbeddingService } from './application/services/ollama-embedding.service';
 import { IngestDocumentUseCase } from './application/use-cases/ingest-document.use-case';
@@ -48,7 +48,7 @@ import {
   providers: [
     DocumentLoaderService,
     SimpleTextChunkerService,
-    TocTextChunkerService,
+    MarkdownHeaderChunkerService,
     ChunkerStrategyRegistry,
     {
       provide: TextChunkerService,
@@ -71,13 +71,13 @@ import {
       useFactory: (
         registry: ChunkerStrategyRegistry,
         simpleChunker: SimpleTextChunkerService,
-        tocChunker: TocTextChunkerService,
+        markdownChunker: MarkdownHeaderChunkerService,
       ) => {
         registry.register(simpleChunker);
-        registry.register(tocChunker);
+        registry.register(markdownChunker);
         return registry;
       },
-      inject: [ChunkerStrategyRegistry, SimpleTextChunkerService, TocTextChunkerService],
+      inject: [ChunkerStrategyRegistry, SimpleTextChunkerService, MarkdownHeaderChunkerService],
     },
     {
       provide: EmbeddingService,

@@ -9,7 +9,7 @@ import { ChunkingConfig, ChunkingTaskStatus } from '../../domain/entities/ingest
 import { RECURSIVE_CHUNKING_STRATEGY } from '../constants/ingestion.constants';
 import { ChunkStrategy } from '../../domain/enums/chunk-strategy.enum';
 import {
-  TocChunkerConfig,
+  MarkdownChunkerConfig,
   RecursiveChunkerConfig,
 } from '../../domain/config/chunker-config.interface';
 
@@ -19,7 +19,8 @@ export interface ChunkDocumentOptions {
   chunkSize?: number;
   chunkOverlap?: number;
   chunkStrategy?: string;
-  tocConfig?: Partial<TocChunkerConfig>;
+  markdownConfig?: Partial<MarkdownChunkerConfig>;
+  config?: any; // Generic config object from file
   collectionName?: string;
 }
 
@@ -65,8 +66,9 @@ export class ChunkDocumentUseCase {
       const chunker = this.chunkerRegistry.getChunker(strategy);
 
       let chunks;
-      if (strategy === ChunkStrategy.TOC && options.tocConfig) {
-        chunks = await chunker.chunkDocuments(documents, options.tocConfig as TocChunkerConfig);
+      if (strategy === ChunkStrategy.MARKDOWN) {
+        const markdownConfig = options.markdownConfig || options.config || {};
+        chunks = await chunker.chunkDocuments(documents, markdownConfig as MarkdownChunkerConfig);
       } else if (strategy === ChunkStrategy.RECURSIVE) {
         chunks = await chunker.chunkDocuments(documents, {
           chunkSize: chunkingConfig.size,
