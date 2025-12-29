@@ -22,7 +22,8 @@
     "chunk": "ts-node -r tsconfig-paths/register src/cli/chunk-document.cli.ts",
     "test-toc": "ts-node -r tsconfig-paths/register src/cli/test-toc-chunking.cli.ts",
     "embed": "ts-node -r tsconfig-paths/register src/cli/embed-document.cli.ts",
-    "search": "ts-node -r tsconfig-paths/register src/cli/search-vectors.cli.ts"
+    "search": "ts-node -r tsconfig-paths/register src/cli/search-vectors.cli.ts",
+    "query-rag": "ts-node -r tsconfig-paths/register src/cli/query-rag.cli.ts"
   },
   "dependencies": {
     "@langchain/community": "1.1.0",

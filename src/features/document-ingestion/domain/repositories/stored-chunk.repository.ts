@@ -22,4 +22,6 @@ export abstract class StoredChunkRepository {
     skip: number,
     limit: number,
   ): Promise<StoredChunk[]>;
+
+  abstract findById(id: string, collectionName?: string): Promise<StoredChunk | null>;
 }

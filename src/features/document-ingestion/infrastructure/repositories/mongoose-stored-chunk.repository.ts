@@ -46,6 +46,15 @@ export class MongooseStoredChunkRepository implements StoredChunkRepository {
     return chunks.map((chunk) => this.toDomain(chunk));
   }
 
+  async findById(id: string, collectionName?: string): Promise<StoredChunk | null> {
+    const model = collectionName
+      ? this.chunkModel.db.model(StoredChunkDocument.name, this.chunkModel.schema, collectionName)
+      : this.chunkModel;
+
+    const document = await model.findById(id).exec();
+    return document ? this.toDomain(document) : null;
+  }
+
   private toDomain(document: StoredChunkDocument): StoredChunk {
     return new StoredChunk(
       document._id.toString(),

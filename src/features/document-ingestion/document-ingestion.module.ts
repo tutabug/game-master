@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OllamaEmbeddings } from '@langchain/ollama';
+import { OllamaEmbeddings, ChatOllama } from '@langchain/ollama';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { DocumentLoaderService } from './application/services/document-loader.service';
 import { SimpleTextChunkerService } from './application/services/simple-text-chunker.service';
@@ -11,6 +11,7 @@ import { OllamaEmbeddingService } from './application/services/ollama-embedding.
 import { IngestDocumentUseCase } from './application/use-cases/ingest-document.use-case';
 import { ChunkDocumentUseCase } from './application/use-cases/chunk-document.use-case';
 import { ProcessEmbeddingsUseCase } from './application/use-cases/process-embeddings.use-case';
+import { QueryWithContextUseCase } from './application/use-cases/query-with-context.use-case';
 import { QdrantVectorRepository } from './infrastructure/repositories/qdrant-vector.repository';
 import { MongooseChunkingTaskRepository } from './infrastructure/repositories/mongoose-chunking-task.repository';
 import { MongooseStoredChunkRepository } from './infrastructure/repositories/mongoose-stored-chunk.repository';
@@ -67,6 +68,19 @@ import {
       inject: [ConfigService],
     },
     {
+      provide: ChatOllama,
+      useFactory: (configService: ConfigService) => {
+        const baseUrl = configService.get<string>('OLLAMA_BASE_URL', 'http://localhost:11434');
+        const model = configService.get<string>('OLLAMA_CHAT_MODEL', 'llama3.2');
+        return new ChatOllama({
+          baseUrl,
+          model,
+          temperature: 0.7,
+        });
+      },
+      inject: [ConfigService],
+    },
+    {
       provide: 'CHUNKER_REGISTRY_INIT',
       useFactory: (
         registry: ChunkerStrategyRegistry,
@@ -114,7 +128,13 @@ import {
     IngestDocumentUseCase,
     ChunkDocumentUseCase,
     ProcessEmbeddingsUseCase,
+    QueryWithContextUseCase,
   ],
-  exports: [IngestDocumentUseCase, ChunkDocumentUseCase, ProcessEmbeddingsUseCase],
+  exports: [
+    IngestDocumentUseCase,
+    ChunkDocumentUseCase,
+    ProcessEmbeddingsUseCase,
+    QueryWithContextUseCase,
+  ],
 })
 export class DocumentIngestionModule {}
