@@ -11,7 +11,7 @@ services:
       - QDRANT_URL=http://qdrant:6333
       - OLLAMA_BASE_URL=http://ollama:11434
       - OLLAMA_MODEL=nomic-embed-text
-      - OLLAMA_CHAT_MODEL=llama3.2:1b
+      - OLLAMA_CHAT_MODEL=llama3.2:3b
       - NODE_ENV=development
     volumes:
       - .:/usr/src/app
@@ -74,8 +74,8 @@ services:
       - |
         echo "Pulling nomic-embed-text model..."
         ollama pull nomic-embed-text
-        echo "Pulling llama3.2:1b model (smaller, faster)..."
-        ollama pull llama3.2:1b
+        echo "Pulling llama3.2:3b model..."
+        ollama pull llama3.2:3b
         echo "Models pulled successfully!"
     restart: "no"
 

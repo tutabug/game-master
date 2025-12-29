@@ -68,6 +68,14 @@ export class QueryWithContextUseCase {
       score: result.score,
     }));
 
+    // Log retrieved chunks for debugging
+    this.logger.log('Retrieved chunks:');
+    chunks.forEach((chunk, idx) => {
+      this.logger.log(
+        `[${idx + 1}] Score: ${chunk.score.toFixed(4)} | Content preview: ${chunk.content.substring(0, 100)}...`,
+      );
+    });
+
     // Step 4: Build context from retrieved chunks
     const context = chunks.map((chunk, idx) => `[${idx + 1}] ${chunk.content}`).join('\n\n---\n\n');
 
@@ -120,6 +128,14 @@ export class QueryWithContextUseCase {
       },
       score: result.score,
     }));
+
+    // Log retrieved chunks for debugging
+    this.logger.log('Retrieved chunks:');
+    chunks.forEach((chunk, idx) => {
+      this.logger.log(
+        `[${idx + 1}] Score: ${chunk.score.toFixed(4)} | Content preview: ${chunk.content.substring(0, 100)}...`,
+      );
+    });
 
     // Step 4-5: Build context and prompt
     const context = chunks.map((chunk, idx) => `[${idx + 1}] ${chunk.content}`).join('\n\n---\n\n');

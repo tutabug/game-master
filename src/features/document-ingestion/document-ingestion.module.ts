@@ -75,7 +75,7 @@ import {
         return new ChatOllama({
           baseUrl,
           model,
-          temperature: 0.7,
+          temperature: 0.3, // Lower temperature for more factual responses
         });
       },
       inject: [ConfigService],
