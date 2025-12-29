@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ChatOllama } from '@langchain/ollama';
 import { EmbeddingService } from '../../domain/services/embedding.service';
 import { VectorStoreService } from '../../domain/services/vector-store.service';
-import { StoredChunkRepository } from '../../domain/repositories/stored-chunk.repository';
+import { LlmChatService } from '../../domain/services/llm-chat.service';
 import {
   RAG_SYSTEM_PROMPT,
   RAG_USER_PROMPT_TEMPLATE,
@@ -34,8 +33,7 @@ export class QueryWithContextUseCase {
   constructor(
     private readonly embeddingService: EmbeddingService,
     private readonly vectorStoreService: VectorStoreService,
-    private readonly chunkRepository: StoredChunkRepository,
-    private readonly chatModel: ChatOllama,
+    private readonly llmChatService: LlmChatService,
   ) {}
 
   async execute(query: string, options: QueryWithContextOptions = {}): Promise<QueryResult> {
@@ -88,13 +86,13 @@ export class QueryWithContextUseCase {
     this.logger.log('Sending request to LLM...');
 
     // Step 6: Call LLM
-    const response = await this.chatModel.invoke([
+    const response = await this.llmChatService.invoke([
       { role: 'system', content: RAG_SYSTEM_PROMPT },
       { role: 'user', content: userPrompt },
     ]);
 
     return {
-      answer: response.content as string,
+      answer: response.content,
       sources: chunks,
     };
   }
@@ -146,18 +144,16 @@ export class QueryWithContextUseCase {
     );
 
     this.logger.log('Streaming response from LLM...');
-    this.logger.debug(`Using model: ${this.chatModel.model}`);
-    this.logger.debug(`Base URL: ${this.chatModel.baseUrl}`);
 
     // Step 6: Stream LLM response
     try {
-      const stream = await this.chatModel.stream([
+      const stream = this.llmChatService.stream([
         { role: 'system', content: RAG_SYSTEM_PROMPT },
         { role: 'user', content: userPrompt },
       ]);
 
       for await (const chunk of stream) {
-        yield chunk.content as string;
+        yield chunk.content;
       }
     } catch (error) {
       this.logger.error('Error streaming from LLM:', error);

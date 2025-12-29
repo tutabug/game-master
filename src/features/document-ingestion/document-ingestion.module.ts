@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OllamaEmbeddings, ChatOllama } from '@langchain/ollama';
+import { OllamaEmbeddings } from '@langchain/ollama';
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { LlmChatService } from './domain/services/llm-chat.service';
+import { OllamaLlmChatService } from './infrastructure/services/ollama-llm-chat.service';
+import { GeminiLlmChatService } from './infrastructure/services/gemini-llm-chat.service';
 import { DocumentLoaderService } from './application/services/document-loader.service';
 import { SimpleTextChunkerService } from './application/services/simple-text-chunker.service';
 import { MarkdownHeaderChunkerService } from './application/services/markdown-header-chunker.service';
@@ -68,15 +71,13 @@ import {
       inject: [ConfigService],
     },
     {
-      provide: ChatOllama,
+      provide: LlmChatService,
       useFactory: (configService: ConfigService) => {
-        const baseUrl = configService.get<string>('OLLAMA_BASE_URL', 'http://localhost:11434');
-        const model = configService.get<string>('OLLAMA_CHAT_MODEL', 'llama3.2');
-        return new ChatOllama({
-          baseUrl,
-          model,
-          temperature: 0.3, // Lower temperature for more factual responses
-        });
+        const provider = configService.get<string>('LLM_PROVIDER', 'ollama');
+        if (provider === 'gemini') {
+          return new GeminiLlmChatService(configService);
+        }
+        return new OllamaLlmChatService(configService);
       },
       inject: [ConfigService],
     },
